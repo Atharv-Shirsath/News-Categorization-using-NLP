@@ -1,19 +1,3 @@
-"""
-newschori.py
-
-Your original Selenium scraper, kept as-is in approach (same URL, same
-scroll-and-wait pattern, same "gPFEn" class), with two additions:
-
-1. It now also grabs each headline's link (needed for the "Get NEWS" table
-   and double-click-to-open behaviour in tk.py).
-2. Each headline is run through your pretrained TF-IDF + Logistic
-   Regression model right after scraping, so every item in `l` already has
-   a "category" key by the time tk.py reads it.
-
-`l` is populated at import time, same as your original script — tk.py does
-`import newschori` and reads `newschori.l`.
-"""
-
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -32,14 +16,6 @@ l = []
 
 
 def _get_link(art):
-    """
-    The 'gPFEn' element is usually the <a> tag itself (that's why .text on
-    it already gave you the full headline in your original script) — so
-    looking *above* it for an ancestor <a> finds nothing. Try, in order:
-    1. art itself, if it's already an <a>
-    2. the nearest ancestor <a>
-    3. an <a> among its siblings
-    """
     try:
         if art.tag_name.lower() == "a":
             href = art.get_attribute("href")
@@ -108,8 +84,6 @@ def _categorize(items):
         for it, cat in zip(items, preds):
             it["category"] = cat
     except Exception as e:
-        # If the model can't load for any reason, still show the news —
-        # just mark it as uncategorized instead of crashing the app.
         for it in items:
             it["category"] = f"Uncategorized ({e.__class__.__name__})"
     return items
